@@ -2,7 +2,7 @@
 ## Title: PopQuest
 ## Notes: Pops up a prompt when you loot an item that starts a quest.
 ## Author: LankyFranky89
-## Version: 1.0.0
+## Version: 1.0.1
 ## SavedVariables: PopQuestDB
 
 PopQuest.lua
