@@ -3,6 +3,8 @@ local C = C_Container
 local GetNumSlots = (C and C.GetContainerNumSlots) or GetContainerNumSlots
 local GetItemID   = (C and C.GetContainerItemID) or GetContainerItemID
 local NUM_BAGS = NUM_BAG_SLOTS or 4
+local GetInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
+local GetIcon = (C_Item and C_Item.GetItemIconByID) or GetItemIcon
 local STARTS = ITEM_STARTS_QUEST or "This Item Begins a Quest"
 
 local known, queue, ready, debug = {}, {}, false, false
@@ -95,8 +97,8 @@ function ShowNext()
   if not itemID then return end
   local bag, slot = FindItem(itemID)
   if not bag then return ShowNext() end
-  local nm, link, _, _, _, _, _, _, _, tex = GetItemInfo(itemID)
-  icon:SetTexture(tex or GetItemIcon(itemID))
+  local nm, link, _, _, _, _, _, _, _, tex = GetInfo(itemID)
+  icon:SetTexture(tex or GetIcon and GetIcon(itemID))
   name:SetText(link or nm or ("item " .. itemID))
   view:SetAttribute("item", bag .. " " .. slot)
   f:Show()
