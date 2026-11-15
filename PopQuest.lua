@@ -91,12 +91,34 @@ local function FindItem(itemID)
   end
 end
 
+local UseItem = (C and C.UseContainerItem) or UseContainerItem
+local waitingDetail, popupFor
+
+-- try to open the quest window directly; fall back to the popup
+local function TryDirect(itemID, bag, slot)
+  if InCombatLockdown() or not UseItem then return false end
+  waitingDetail = itemID
+  local ok = pcall(UseItem, bag, slot)
+  if not ok then waitingDetail = nil; return false end
+  C_Timer.After(1.5, function()
+    if waitingDetail == itemID then -- quest window never opened
+      waitingDetail = nil
+      dprint("direct open failed, showing popup", itemID)
+      popupFor = itemID; table.insert(queue, 1, itemID); ShowNext()
+    end
+  end)
+  return true
+end
+
 function ShowNext()
-  if InCombatLockdown() or f:IsShown() then return end
+  if InCombatLockdown() or f:IsShown() or waitingDetail then return end
+  if QuestFrame and QuestFrame:IsShown() then return end
   local itemID = table.remove(queue, 1)
   if not itemID then return end
   local bag, slot = FindItem(itemID)
   if not bag then return ShowNext() end
+  if popupFor ~= itemID and TryDirect(itemID, bag, slot) then return end
+  popupFor = nil
   local nm, link, _, _, _, _, _, _, _, tex = GetInfo(itemID)
   icon:SetTexture(tex or GetIcon and GetIcon(itemID))
   name:SetText(link or nm or ("item " .. itemID))
@@ -145,9 +167,15 @@ ev:RegisterEvent("PLAYER_ENTERING_WORLD")
 ev:RegisterEvent("BAG_UPDATE_DELAYED")
 ev:RegisterEvent("BAG_UPDATE")
 ev:RegisterEvent("PLAYER_REGEN_ENABLED")
+ev:RegisterEvent("QUEST_DETAIL")
+ev:RegisterEvent("QUEST_FINISHED")
 ev:SetScript("OnEvent", function(_, e)
   if e == "PLAYER_ENTERING_WORLD" then
     if not ready then C_Timer.After(3, Scan) end -- snapshot existing items silently
+  elseif e == "QUEST_DETAIL" then
+    waitingDetail = nil
+  elseif e == "QUEST_FINISHED" then
+    C_Timer.After(0.3, ShowNext) -- next starter, if several were looted
   elseif e == "PLAYER_REGEN_ENABLED" then
     ShowNext()
   else

@@ -1,6 +1,6 @@
 # PopQuest
 
-A WoW Forever (Interface 16001) addon. When you loot an item that starts a quest, PopQuest shows a popup. Click **View Quest** to open the normal quest window and accept it there.
+A WoW Forever (Interface 16001) addon. When you loot an item that starts a quest, PopQuest opens the quest window right away so you can click Accept. In combat (or if the game blocks it) you get a small popup with a **View Quest** button instead.
 
 - Skips items whose quest you already have
 - Waits until combat ends before showing the popup
