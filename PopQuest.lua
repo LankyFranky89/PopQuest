@@ -171,7 +171,7 @@ ev:RegisterEvent("QUEST_DETAIL")
 ev:RegisterEvent("QUEST_FINISHED")
 ev:SetScript("OnEvent", function(_, e)
   if e == "PLAYER_ENTERING_WORLD" then
-    if not ready then C_Timer.After(3, Scan) end -- snapshot existing items silently
+    if not ready then ready = true; C_Timer.After(0.5, Scan) end -- prompt for starters already in bags
   elseif e == "QUEST_DETAIL" then
     waitingDetail = nil
   elseif e == "QUEST_FINISHED" then
